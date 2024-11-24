@@ -15,7 +15,7 @@ func IndexHTML(basePath string) (string, error) {
 			<li><a href="https://github.com/samber/do" target="_blank">Repository</a></li>
 			<li><a href="https://github.com/samber/do/issues" target="_blank">New issue</a></li>
 			<li><a href="https://do.samber.dev" target="_blank">Documentation</a></li>
-			<li><a href="https://pkg.go.dev/github.com/samber/do/v2" target="_blank">Godoc</a></li>
+			<li><a href="https://pkg.go.dev/github.com/nanostack-dev/do" target="_blank">Godoc</a></li>
 			<li><a href="https://github.com/samber/do/releases" target="_blank">Changelog</a></li>
 			<li><a href="https://github.com/samber/do/blob/master/LICENSE" target="_blank">License</a></li>
 		</ul>

@@ -27,24 +27,28 @@ func TestInvokeAnyByName(t *testing.T) {
 
 	// test virtual scope wrapper
 	called := false
-	ProvideNamed(i, "hello", func(ivs Injector) (string, error) {
-		// check we received a virtualScope
-		vs, ok := ivs.(*virtualScope)
-		is.True(ok)
-		is.Equal([]string{"hello"}, vs.invokerChain)
-		is.NotEqual(i, ivs)
+	ProvideNamed(
+		i, "hello", func(ivs Injector) (string, error) {
+			// check we received a virtualScope
+			vs, ok := ivs.(*virtualScope)
+			is.True(ok)
+			is.Equal([]string{"hello"}, vs.invokerChain)
+			is.NotEqual(i, ivs)
 
-		// create a dependency/dependent relationship
-		_, _ = invokeAnyByName(ivs, "foo")
+			// create a dependency/dependent relationship
+			_, _ = invokeAnyByName(ivs, "foo")
 
-		called = true
-		return "foobar", nil
-	})
+			called = true
+			return "foobar", nil
+		},
+	)
 	_, _ = invokeAnyByName(i, "hello")
 	is.True(called)
 	// check dependency/dependent relationship
 	dependencies, dependents := i.dag.explainService(i.self.id, i.self.name, "hello")
-	is.ElementsMatch([]EdgeService{{ScopeID: i.self.id, ScopeName: i.self.name, Service: "foo"}}, dependencies)
+	is.ElementsMatch(
+		[]EdgeService{{ScopeID: i.self.id, ScopeName: i.self.name, Service: "foo"}}, dependencies,
+	)
 	is.ElementsMatch([]EdgeService{}, dependents)
 
 	// test circular dependency
@@ -84,24 +88,28 @@ func TestInvokeByName(t *testing.T) {
 
 	// test virtual scope wrapper
 	called := false
-	ProvideNamed(i, "hello", func(ivs Injector) (string, error) {
-		// check we received a virtualScope
-		vs, ok := ivs.(*virtualScope)
-		is.True(ok)
-		is.Equal([]string{"hello"}, vs.invokerChain)
-		is.NotEqual(i, ivs)
+	ProvideNamed(
+		i, "hello", func(ivs Injector) (string, error) {
+			// check we received a virtualScope
+			vs, ok := ivs.(*virtualScope)
+			is.True(ok)
+			is.Equal([]string{"hello"}, vs.invokerChain)
+			is.NotEqual(i, ivs)
 
-		// create a dependency/dependent relationship
-		_, _ = invokeByName[string](ivs, "foo")
+			// create a dependency/dependent relationship
+			_, _ = invokeByName[string](ivs, "foo")
 
-		called = true
-		return "foobar", nil
-	})
+			called = true
+			return "foobar", nil
+		},
+	)
 	_, _ = invokeByName[string](i, "hello")
 	is.True(called)
 	// check dependency/dependent relationship
 	dependencies, dependents := i.dag.explainService(i.self.id, i.self.name, "hello")
-	is.ElementsMatch([]EdgeService{{ScopeID: i.self.id, ScopeName: i.self.name, Service: "foo"}}, dependencies)
+	is.ElementsMatch(
+		[]EdgeService{{ScopeID: i.self.id, ScopeName: i.self.name, Service: "foo"}}, dependencies,
+	)
 	is.ElementsMatch([]EdgeService{}, dependents)
 
 	// test circular dependency
@@ -137,39 +145,58 @@ func TestInvokeByGenericType(t *testing.T) {
 	svcX, err := invokeByGenericType[string](i)
 	is.Empty(svcX)
 	is.NotNil(err)
-	is.Contains(err.Error(), "DI: could not find service satisfying interface `string`, available services: `*github.com/samber/do/v2.lazyTest`")
+	is.Contains(
+		err.Error(),
+		"DI: could not find service satisfying interface `string`, available services: `*github.com/nanostack-dev/do.lazyTest`",
+	)
 
 	// test virtual scope wrapper
 	called := false
-	Provide(i, func(ivs Injector) (*eagerTest, error) {
-		// check we received a virtualScope
-		vs, ok := ivs.(*virtualScope)
-		is.True(ok)
-		is.Equal([]string{"*github.com/samber/do/v2.eagerTest"}, vs.invokerChain)
-		is.NotEqual(i, ivs)
+	Provide(
+		i, func(ivs Injector) (*eagerTest, error) {
+			// check we received a virtualScope
+			vs, ok := ivs.(*virtualScope)
+			is.True(ok)
+			is.Equal([]string{"*github.com/nanostack-dev/do.eagerTest"}, vs.invokerChain)
+			is.NotEqual(i, ivs)
 
-		// create a dependency/dependent relationship
-		_, _ = invokeByGenericType[*lazyTest](ivs)
+			// create a dependency/dependent relationship
+			_, _ = invokeByGenericType[*lazyTest](ivs)
 
-		called = true
-		return &eagerTest{}, nil
-	})
+			called = true
+			return &eagerTest{}, nil
+		},
+	)
 	_, _ = invokeByGenericType[*eagerTest](i)
 	is.True(called)
 	// check dependency/dependent relationship
-	dependencies, dependents := i.dag.explainService(i.self.id, i.self.name, "*github.com/samber/do/v2.eagerTest")
-	is.ElementsMatch([]EdgeService{{ScopeID: i.self.id, ScopeName: i.self.name, Service: "*github.com/samber/do/v2.lazyTest"}}, dependencies)
+	dependencies, dependents := i.dag.explainService(
+		i.self.id, i.self.name, "*github.com/nanostack-dev/do.eagerTest",
+	)
+	is.ElementsMatch(
+		[]EdgeService{
+			{
+				ScopeID: i.self.id, ScopeName: i.self.name,
+				Service: "*github.com/nanostack-dev/do.lazyTest",
+			},
+		}, dependencies,
+	)
 	is.ElementsMatch([]EdgeService{}, dependents)
 
 	// test circular dependency
-	vs := virtualScope{invokerChain: []string{"*github.com/samber/do/v2.eagerTest", "bar"}, self: i}
+	vs := virtualScope{
+		invokerChain: []string{"*github.com/nanostack-dev/do.eagerTest", "bar"}, self: i,
+	}
 	svc1, err = invokeByGenericType[*eagerTest](&vs)
 	is.Error(err)
 
 	is.Empty(svc1)
 	is.ErrorIs(err, ErrCircularDependency)
 
-	is.EqualError(err, "DI: circular dependency detected: `*github.com/samber/do/v2.eagerTest` -> `bar` -> `*github.com/samber/do/v2.eagerTest`")
+	is.EqualError(
+		err,
+		"DI: circular dependency detected: `*github.com/nanostack-dev/do.eagerTest` -> `bar` -> `*github.com/nanostack-dev/do.eagerTest`",
+	)
 
 	// @TODO
 }
@@ -180,14 +207,18 @@ func TestInvokeByName_race(t *testing.T) {
 	injector := New()
 	child := injector.Scope("child")
 
-	Provide(injector, func(i Injector) (int, error) {
-		time.Sleep(3 * time.Millisecond)
-		return 42, nil
-	})
-	Provide(injector, func(i Injector) (*lazyTest, error) {
-		time.Sleep(3 * time.Millisecond)
-		return &lazyTest{}, nil
-	})
+	Provide(
+		injector, func(i Injector) (int, error) {
+			time.Sleep(3 * time.Millisecond)
+			return 42, nil
+		},
+	)
+	Provide(
+		injector, func(i Injector) (*lazyTest, error) {
+			time.Sleep(3 * time.Millisecond)
+			return &lazyTest{}, nil
+		},
+	)
 
 	var wg sync.WaitGroup
 	wg.Add(5)
@@ -211,14 +242,18 @@ func TestInvokeByGenericType_race(t *testing.T) {
 	injector := New()
 	child := injector.Scope("child")
 
-	Provide(injector, func(i Injector) (int, error) {
-		time.Sleep(3 * time.Millisecond)
-		return 42, nil
-	})
-	Provide(injector, func(i Injector) (*lazyTest, error) {
-		time.Sleep(3 * time.Millisecond)
-		return &lazyTest{}, nil
-	})
+	Provide(
+		injector, func(i Injector) (int, error) {
+			time.Sleep(3 * time.Millisecond)
+			return 42, nil
+		},
+	)
+	Provide(
+		injector, func(i Injector) (*lazyTest, error) {
+			time.Sleep(3 * time.Millisecond)
+			return &lazyTest{}, nil
+		},
+	)
 
 	var wg sync.WaitGroup
 	wg.Add(5)
@@ -274,7 +309,11 @@ func TestInvokeByTags(t *testing.T) {
 	}
 	test3 := dependencyNotFound{}
 	err = invokeByTags(i, "*myStruct", reflect.ValueOf(&test3))
-	is.Equal(serviceNotFound(i, ErrServiceNotFound, []string{inferServiceName[*hasNonExportedEagerTestDependency]()}).Error(), err.Error())
+	is.Equal(
+		serviceNotFound(
+			i, ErrServiceNotFound, []string{inferServiceName[*hasNonExportedEagerTestDependency]()},
+		).Error(), err.Error(),
+	)
 
 	// use tag
 	type namedDependency struct {
@@ -282,7 +321,10 @@ func TestInvokeByTags(t *testing.T) {
 	}
 	test4 := namedDependency{}
 	err = invokeByTags(i, "*myStruct", reflect.ValueOf(&test4))
-	is.Equal(serviceNotFound(i, ErrServiceNotFound, []string{inferServiceName[int]()}).Error(), err.Error())
+	is.Equal(
+		serviceNotFound(i, ErrServiceNotFound, []string{inferServiceName[int]()}).Error(),
+		err.Error(),
+	)
 
 	// named service
 	ProvideNamedValue(i, "foobar", 42)
@@ -296,11 +338,14 @@ func TestInvokeByTags(t *testing.T) {
 
 	// use tag but wrong type
 	type namedDependencyButTypeMismatch struct {
-		EagerTest *int `do:"*github.com/samber/do/v2.eagerTest"`
+		EagerTest *int `do:"*github.com/nanostack-dev/do.eagerTest"`
 	}
 	test6 := namedDependencyButTypeMismatch{}
 	err = invokeByTags(i, "*myStruct", reflect.ValueOf(&test6))
-	is.Equal("DI: field `*myStruct.EagerTest` is not assignable to service *github.com/samber/do/v2.eagerTest", err.Error())
+	is.Equal(
+		"DI: field `*myStruct.EagerTest` is not assignable to service *github.com/nanostack-dev/do.eagerTest",
+		err.Error(),
+	)
 
 	// use a custom tag
 	i = NewWithOpts(&InjectorOpts{StructTagKey: "hello"})
@@ -334,24 +379,44 @@ func TestServiceNotFound(t *testing.T) {
 	err = serviceNotFound(child1, ErrServiceNotFound, []string{"not-found1", "not-found2"})
 	is.Error(err)
 	is.ErrorIs(err, ErrServiceNotFound)
-	is.EqualError(err, "DI: could not find service `not-found2`, no service available, path: `not-found1` -> `not-found2`")
+	is.EqualError(
+		err,
+		"DI: could not find service `not-found2`, no service available, path: `not-found1` -> `not-found2`",
+	)
 
-	rootScope.serviceSet("root-a", newServiceLazy("root-a", func(i Injector) (int, error) { return 0, nil }))
-	child1.serviceSet("child1-a", newServiceLazy("child1-a", func(i Injector) (int, error) { return 1, nil }))
-	child2a.serviceSet("child2a-a", newServiceLazy("child2a-a", func(i Injector) (int, error) { return 2, nil }))
-	child2a.serviceSet("child2a-b", newServiceLazy("child2a-b", func(i Injector) (int, error) { return 3, nil }))
-	child2b.serviceSet("child2b-a", newServiceLazy("child2b-a", func(i Injector) (int, error) { return 4, nil }))
-	child3.serviceSet("child3-a", newServiceLazy("child3-a", func(i Injector) (int, error) { return 5, nil }))
+	rootScope.serviceSet(
+		"root-a", newServiceLazy("root-a", func(i Injector) (int, error) { return 0, nil }),
+	)
+	child1.serviceSet(
+		"child1-a", newServiceLazy("child1-a", func(i Injector) (int, error) { return 1, nil }),
+	)
+	child2a.serviceSet(
+		"child2a-a", newServiceLazy("child2a-a", func(i Injector) (int, error) { return 2, nil }),
+	)
+	child2a.serviceSet(
+		"child2a-b", newServiceLazy("child2a-b", func(i Injector) (int, error) { return 3, nil }),
+	)
+	child2b.serviceSet(
+		"child2b-a", newServiceLazy("child2b-a", func(i Injector) (int, error) { return 4, nil }),
+	)
+	child3.serviceSet(
+		"child3-a", newServiceLazy("child3-a", func(i Injector) (int, error) { return 5, nil }),
+	)
 
 	err = serviceNotFound(child1, ErrServiceNotFound, []string{"not-found"})
 	is.Error(err)
 	is.ErrorIs(err, ErrServiceNotFound)
-	is.EqualError(err, "DI: could not find service `not-found`, available services: `child1-a`, `root-a`")
+	is.EqualError(
+		err, "DI: could not find service `not-found`, available services: `child1-a`, `root-a`",
+	)
 
 	err = serviceNotFound(child1, ErrServiceNotFound, []string{"not-found1", "not-found2"})
 	is.Error(err)
 	is.ErrorIs(err, ErrServiceNotFound)
-	is.EqualError(err, "DI: could not find service `not-found2`, available services: `child1-a`, `root-a`, path: `not-found1` -> `not-found2`")
+	is.EqualError(
+		err,
+		"DI: could not find service `not-found2`, available services: `child1-a`, `root-a`, path: `not-found1` -> `not-found2`",
+	)
 
 	// @TODO: test service ordering
 }

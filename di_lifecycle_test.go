@@ -13,8 +13,14 @@ func TestHealthCheck(t *testing.T) {
 	i := New()
 
 	Provide(i, func(i Injector) (*lazyTest, error) { return &lazyTest{}, nil })
-	Provide(i, func(i Injector) (*lazyTestHeathcheckerOK, error) { return &lazyTestHeathcheckerOK{}, nil })
-	Provide(i, func(i Injector) (*lazyTestHeathcheckerKO, error) { return &lazyTestHeathcheckerKO{}, nil })
+	Provide(
+		i,
+		func(i Injector) (*lazyTestHeathcheckerOK, error) { return &lazyTestHeathcheckerOK{}, nil },
+	)
+	Provide(
+		i,
+		func(i Injector) (*lazyTestHeathcheckerKO, error) { return &lazyTestHeathcheckerKO{}, nil },
+	)
 
 	is.Nil(HealthCheck[*lazyTest](i))
 	is.Nil(HealthCheck[*lazyTestHeathcheckerOK](i))
@@ -35,9 +41,11 @@ func TestHealthCheckWithContext(t *testing.T) {
 	i := New()
 	ctx := context.Background()
 
-	Provide(i, func(i Injector) (*lazyTestHeathcheckerKOCtx, error) {
-		return &lazyTestHeathcheckerKOCtx{foobar: "foobar"}, nil
-	})
+	Provide(
+		i, func(i Injector) (*lazyTestHeathcheckerKOCtx, error) {
+			return &lazyTestHeathcheckerKOCtx{foobar: "foobar"}, nil
+		},
+	)
 	is.Nil(HealthCheckWithContext[*lazyTestHeathcheckerKOCtx](ctx, i))
 	_, _ = Invoke[*lazyTestHeathcheckerKOCtx](i)
 
@@ -49,7 +57,10 @@ func TestHealthCheckNamed(t *testing.T) {
 
 	i := New()
 
-	ProvideNamed(i, "foobar", func(i Injector) (*lazyTestHeathcheckerKO, error) { return &lazyTestHeathcheckerKO{}, nil })
+	ProvideNamed(
+		i, "foobar",
+		func(i Injector) (*lazyTestHeathcheckerKO, error) { return &lazyTestHeathcheckerKO{}, nil },
+	)
 	is.Nil(HealthCheckNamed(i, "foobar"))
 	_, _ = InvokeNamed[*lazyTestHeathcheckerKO](i, "foobar")
 
@@ -62,9 +73,11 @@ func TestHealthCheckNamedWithContext(t *testing.T) {
 	i := New()
 	ctx := context.Background()
 
-	ProvideNamed(i, "foobar", func(i Injector) (*lazyTestHeathcheckerKOCtx, error) {
-		return &lazyTestHeathcheckerKOCtx{foobar: "foobar"}, nil
-	})
+	ProvideNamed(
+		i, "foobar", func(i Injector) (*lazyTestHeathcheckerKOCtx, error) {
+			return &lazyTestHeathcheckerKOCtx{foobar: "foobar"}, nil
+		},
+	)
 	is.Nil(HealthCheckNamedWithContext(ctx, i, "foobar"))
 	_, _ = InvokeNamed[*lazyTestHeathcheckerKOCtx](i, "foobar")
 
@@ -80,9 +93,11 @@ func TestShutdown(t *testing.T) {
 
 	i := New()
 
-	Provide(i, func(i Injector) (test, error) {
-		return test{foobar: "foobar"}, nil
-	})
+	Provide(
+		i, func(i Injector) (test, error) {
+			return test{foobar: "foobar"}, nil
+		},
+	)
 
 	instance, err := Invoke[test](i)
 	is.Equal(test{foobar: "foobar"}, instance)
@@ -105,9 +120,11 @@ func TestShutdownWithContext(t *testing.T) {
 	i := New()
 	ctx := context.Background()
 
-	Provide(i, func(i Injector) (*lazyTestShutdownerKOCtx, error) {
-		return &lazyTestShutdownerKOCtx{foobar: "foobar"}, nil
-	})
+	Provide(
+		i, func(i Injector) (*lazyTestShutdownerKOCtx, error) {
+			return &lazyTestShutdownerKOCtx{foobar: "foobar"}, nil
+		},
+	)
 	is.Nil(ShutdownWithContext[*lazyTestShutdownerKOCtx](ctx, i))
 	_, _ = Invoke[*lazyTestShutdownerKOCtx](i)
 
@@ -123,25 +140,31 @@ func TestMustShutdown(t *testing.T) {
 
 	i := New()
 
-	Provide(i, func(i Injector) (test, error) {
-		return test{foobar: "foobar"}, nil
-	})
+	Provide(
+		i, func(i Injector) (test, error) {
+			return test{foobar: "foobar"}, nil
+		},
+	)
 
 	instance, err := Invoke[test](i)
 	is.Equal(test{foobar: "foobar"}, instance)
 	is.Nil(err)
 
-	is.NotPanics(func() {
-		MustShutdown[test](i)
-	})
+	is.NotPanics(
+		func() {
+			MustShutdown[test](i)
+		},
+	)
 
 	instance, err = Invoke[test](i)
 	is.Empty(instance)
 	is.NotNil(err)
 
-	is.Panics(func() {
-		MustShutdown[test](i)
-	})
+	is.Panics(
+		func() {
+			MustShutdown[test](i)
+		},
+	)
 }
 
 func TestMustShutdownWithContext(t *testing.T) {
@@ -150,17 +173,24 @@ func TestMustShutdownWithContext(t *testing.T) {
 	i := New()
 	ctx := context.Background()
 
-	Provide(i, func(i Injector) (*lazyTestShutdownerKOCtx, error) {
-		return &lazyTestShutdownerKOCtx{foobar: "foobar"}, nil
-	})
-	is.NotPanics(func() {
-		MustShutdownWithContext[*lazyTestShutdownerKOCtx](ctx, i)
-	})
+	Provide(
+		i, func(i Injector) (*lazyTestShutdownerKOCtx, error) {
+			return &lazyTestShutdownerKOCtx{foobar: "foobar"}, nil
+		},
+	)
+	is.NotPanics(
+		func() {
+			MustShutdownWithContext[*lazyTestShutdownerKOCtx](ctx, i)
+		},
+	)
 	_, _ = Invoke[*lazyTestShutdownerKOCtx](i)
 
-	is.PanicsWithError("DI: could not find service `*github.com/samber/do/v2.lazyTestShutdownerKOCtx`, no service available", func() {
-		MustShutdownWithContext[*lazyTestShutdownerKOCtx](ctx, i)
-	})
+	is.PanicsWithError(
+		"DI: could not find service `*github.com/nanostack-dev/do.lazyTestShutdownerKOCtx`, no service available",
+		func() {
+			MustShutdownWithContext[*lazyTestShutdownerKOCtx](ctx, i)
+		},
+	)
 }
 
 func TestShutdownNamed(t *testing.T) {
@@ -191,13 +221,18 @@ func TestShutdownNamedWithContext(t *testing.T) {
 	i := New()
 	ctx := context.Background()
 
-	ProvideNamed(i, "foobar", func(i Injector) (*lazyTestShutdownerKOCtx, error) {
-		return &lazyTestShutdownerKOCtx{foobar: "foobar"}, nil
-	})
+	ProvideNamed(
+		i, "foobar", func(i Injector) (*lazyTestShutdownerKOCtx, error) {
+			return &lazyTestShutdownerKOCtx{foobar: "foobar"}, nil
+		},
+	)
 	is.Nil(ShutdownNamedWithContext(ctx, i, "foobar"))
 	_, _ = Invoke[*lazyTestShutdownerKOCtx](i)
 
-	is.EqualError(ShutdownNamedWithContext(ctx, i, "foobar"), "DI: could not find service `foobar`, no service available")
+	is.EqualError(
+		ShutdownNamedWithContext(ctx, i, "foobar"),
+		"DI: could not find service `foobar`, no service available",
+	)
 }
 
 func TestMustShutdownNamed(t *testing.T) {
@@ -211,17 +246,21 @@ func TestMustShutdownNamed(t *testing.T) {
 	is.Equal(42, instance)
 	is.Nil(err)
 
-	is.NotPanics(func() {
-		MustShutdownNamed(i, "foobar")
-	})
+	is.NotPanics(
+		func() {
+			MustShutdownNamed(i, "foobar")
+		},
+	)
 
 	instance, err = InvokeNamed[int](i, "foobar")
 	is.Empty(instance)
 	is.NotNil(err)
 
-	is.Panics(func() {
-		MustShutdownNamed(i, "foobar")
-	})
+	is.Panics(
+		func() {
+			MustShutdownNamed(i, "foobar")
+		},
+	)
 }
 
 func TestMustShutdownNamedWithContext(t *testing.T) {
@@ -230,17 +269,23 @@ func TestMustShutdownNamedWithContext(t *testing.T) {
 	i := New()
 	ctx := context.Background()
 
-	ProvideNamed(i, "foobar", func(i Injector) (*lazyTestShutdownerKOCtx, error) {
-		return &lazyTestShutdownerKOCtx{foobar: "foobar"}, nil
-	})
-	is.NotPanics(func() {
-		MustShutdownNamedWithContext(ctx, i, "foobar")
-	})
+	ProvideNamed(
+		i, "foobar", func(i Injector) (*lazyTestShutdownerKOCtx, error) {
+			return &lazyTestShutdownerKOCtx{foobar: "foobar"}, nil
+		},
+	)
+	is.NotPanics(
+		func() {
+			MustShutdownNamedWithContext(ctx, i, "foobar")
+		},
+	)
 	_, _ = InvokeNamed[*lazyTestShutdownerKOCtx](i, "foobar")
 
-	is.PanicsWithError("DI: could not find service `foobar`, no service available", func() {
-		MustShutdownNamedWithContext(ctx, i, "foobar")
-	})
+	is.PanicsWithError(
+		"DI: could not find service `foobar`, no service available", func() {
+			MustShutdownNamedWithContext(ctx, i, "foobar")
+		},
+	)
 }
 
 func TestDoubleInjection(t *testing.T) {
@@ -250,29 +295,45 @@ func TestDoubleInjection(t *testing.T) {
 
 	i := New()
 
-	is.NotPanics(func() {
-		Provide(i, func(i Injector) (*test, error) {
-			return &test{}, nil
-		})
-	})
+	is.NotPanics(
+		func() {
+			Provide(
+				i, func(i Injector) (*test, error) {
+					return &test{}, nil
+				},
+			)
+		},
+	)
 
-	is.PanicsWithError("DI: service `*github.com/samber/do/v2.test` has already been declared", func() {
-		Provide(i, func(i Injector) (*test, error) {
-			return &test{}, nil
-		})
-	})
+	is.PanicsWithError(
+		"DI: service `*github.com/nanostack-dev/do.test` has already been declared", func() {
+			Provide(
+				i, func(i Injector) (*test, error) {
+					return &test{}, nil
+				},
+			)
+		},
+	)
 
-	is.PanicsWithError("DI: service `*github.com/samber/do/v2.test` has already been declared", func() {
-		ProvideValue(i, &test{})
-	})
+	is.PanicsWithError(
+		"DI: service `*github.com/nanostack-dev/do.test` has already been declared", func() {
+			ProvideValue(i, &test{})
+		},
+	)
 
-	is.PanicsWithError("DI: service `*github.com/samber/do/v2.test` has already been declared", func() {
-		ProvideNamed(i, "*github.com/samber/do/v2.test", func(i Injector) (*test, error) {
-			return &test{}, nil
-		})
-	})
+	is.PanicsWithError(
+		"DI: service `*github.com/nanostack-dev/do.test` has already been declared", func() {
+			ProvideNamed(
+				i, "*github.com/nanostack-dev/do.test", func(i Injector) (*test, error) {
+					return &test{}, nil
+				},
+			)
+		},
+	)
 
-	is.PanicsWithError("DI: service `*github.com/samber/do/v2.test` has already been declared", func() {
-		ProvideNamedValue(i, "*github.com/samber/do/v2.test", &test{})
-	})
+	is.PanicsWithError(
+		"DI: service `*github.com/nanostack-dev/do.test` has already been declared", func() {
+			ProvideNamedValue(i, "*github.com/nanostack-dev/do.test", &test{})
+		},
+	)
 }

@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/samber/do/v2/stacktrace"
+	"github.com/nanostack-dev/do/stacktrace"
 	typetostring "github.com/samber/go-type-to-string"
 )
 

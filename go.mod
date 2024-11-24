@@ -1,4 +1,4 @@
-module github.com/samber/do/v2
+module github.com/nanostack-dev/do
 
 go 1.18
 

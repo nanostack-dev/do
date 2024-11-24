@@ -5,7 +5,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/samber/do/v2/stacktrace"
+	"github.com/nanostack-dev/do/stacktrace"
 )
 
 var _ Service[int] = (*serviceEager[int])(nil)

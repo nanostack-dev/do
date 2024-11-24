@@ -3,7 +3,7 @@ package do
 import (
 	"context"
 
-	"github.com/samber/do/v2/stacktrace"
+	"github.com/nanostack-dev/do/stacktrace"
 )
 
 var _ Service[int] = (*serviceTransient[int])(nil)

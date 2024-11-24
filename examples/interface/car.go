@@ -1,6 +1,6 @@
 package main
 
-import "github.com/samber/do/v2"
+import "github.com/nanostack-dev/do"
 
 type Car interface {
 	Start()

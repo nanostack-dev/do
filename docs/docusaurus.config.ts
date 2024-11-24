@@ -92,7 +92,7 @@ $screeb('init', 'da88b088-6c02-40d2-b576-e218b90192a4');
           position: 'left',
         },
         {
-          to: 'https://pkg.go.dev/github.com/samber/do/v2',
+          to: 'https://pkg.go.dev/github.com/nanostack-dev/do',
           label: 'GoDoc',
           position: 'left',
         },
@@ -131,7 +131,7 @@ $screeb('init', 'da88b088-6c02-40d2-b576-e218b90192a4');
             },
             {
               label: 'Godoc',
-              to: 'https://pkg.go.dev/github.com/samber/do/v2',
+              to: 'https://pkg.go.dev/github.com/nanostack-dev/do',
             },
             {
               label: 'License',

@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/samber/do/v2"
+	"github.com/nanostack-dev/do"
 )
 
 /**

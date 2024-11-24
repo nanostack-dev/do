@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/samber/do/v2"
+	"github.com/nanostack-dev/do"
 )
 
 /**
@@ -25,19 +25,25 @@ func (p *Passenger) Shutdown() {
  */
 func bootPassengerModule(injector do.Injector) {
 	// provide passenger
-	do.ProvideNamed(injector, "passenger-1", func(i do.Injector) (*Passenger, error) {
-		return &Passenger{
-			Seat: do.MustInvokeNamed[*Seat](i, "seat-2"),
-		}, nil
-	})
-	do.ProvideNamed(injector, "passenger-2", func(i do.Injector) (*Passenger, error) {
-		return &Passenger{
-			Seat: do.MustInvokeNamed[*Seat](i, "seat-3"),
-		}, nil
-	})
-	do.ProvideNamed(injector, "passenger-3", func(i do.Injector) (*Passenger, error) {
-		return &Passenger{
-			Seat: do.MustInvokeNamed[*Seat](i, "seat-4"),
-		}, nil
-	})
+	do.ProvideNamed(
+		injector, "passenger-1", func(i do.Injector) (*Passenger, error) {
+			return &Passenger{
+				Seat: do.MustInvokeNamed[*Seat](i, "seat-2"),
+			}, nil
+		},
+	)
+	do.ProvideNamed(
+		injector, "passenger-2", func(i do.Injector) (*Passenger, error) {
+			return &Passenger{
+				Seat: do.MustInvokeNamed[*Seat](i, "seat-3"),
+			}, nil
+		},
+	)
+	do.ProvideNamed(
+		injector, "passenger-3", func(i do.Injector) (*Passenger, error) {
+			return &Passenger{
+				Seat: do.MustInvokeNamed[*Seat](i, "seat-4"),
+			}, nil
+		},
+	)
 }

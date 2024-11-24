@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/samber/do/v2/stacktrace"
+	"github.com/nanostack-dev/do/stacktrace"
 )
 
 /////////////////////////////////////////////////////////////////////////////
@@ -76,15 +76,19 @@ func (sd *ExplainServiceOutput) String() string {
 			"ServiceBuildTime": buildTime,
 			"Invoked":          invoked,
 			"Dependencies": strings.Join(
-				mAp(sd.Dependencies, func(item ExplainServiceDependencyOutput, _ int) string {
-					return item.String()
-				}),
+				mAp(
+					sd.Dependencies, func(item ExplainServiceDependencyOutput, _ int) string {
+						return item.String()
+					},
+				),
 				"\n",
 			),
 			"Dependents": strings.Join(
-				mAp(sd.Dependents, func(item ExplainServiceDependencyOutput, _ int) string {
-					return item.String()
-				}),
+				mAp(
+					sd.Dependents, func(item ExplainServiceDependencyOutput, _ int) string {
+						return item.String()
+					},
+				),
 				"\n",
 			),
 		},
@@ -100,14 +104,16 @@ type ExplainServiceDependencyOutput struct {
 
 func (sdd *ExplainServiceDependencyOutput) String() string {
 	lines := flatten(
-		mAp(sdd.Recursive, func(item ExplainServiceDependencyOutput, _ int) []string {
-			return mAp(
-				strings.Split(item.String(), "\n"),
-				func(line string, _ int) string {
-					return "  " + line
-				},
-			)
-		}),
+		mAp(
+			sdd.Recursive, func(item ExplainServiceDependencyOutput, _ int) []string {
+				return mAp(
+					strings.Split(item.String(), "\n"),
+					func(line string, _ int) string {
+						return "  " + line
+					},
+				)
+			},
+		),
 	)
 
 	recursive := strings.Join(lines, "\n")
@@ -168,13 +174,21 @@ func ExplainNamedService(scope Injector, name string) (description ExplainServic
 		ServiceType:      service.getServiceType(),
 		ServiceBuildTime: buildTime,
 		Invoked:          invoked,
-		Dependencies:     newExplainServiceDependencies(_i, newEdgeService(_i.ID(), _i.Name(), name), "dependencies"),
-		Dependents:       newExplainServiceDependencies(_i, newEdgeService(_i.ID(), _i.Name(), name), "dependents"),
+		Dependencies: newExplainServiceDependencies(
+			_i, newEdgeService(_i.ID(), _i.Name(), name), "dependencies",
+		),
+		Dependents: newExplainServiceDependencies(
+			_i, newEdgeService(_i.ID(), _i.Name(), name), "dependents",
+		),
 	}, true
 }
 
-func newExplainServiceDependencies(i Injector, edge EdgeService, mode string) []ExplainServiceDependencyOutput {
-	dependencies, dependents := i.RootScope().dag.explainService(edge.ScopeID, edge.ScopeName, edge.Service)
+func newExplainServiceDependencies(
+	i Injector, edge EdgeService, mode string,
+) []ExplainServiceDependencyOutput {
+	dependencies, dependents := i.RootScope().dag.explainService(
+		edge.ScopeID, edge.ScopeName, edge.Service,
+	)
 
 	deps := dependencies
 	if mode == "dependents" {
@@ -182,21 +196,25 @@ func newExplainServiceDependencies(i Injector, edge EdgeService, mode string) []
 	}
 
 	// order by id to have a deterministic output in unit tests
-	sort.Slice(deps, func(i, j int) bool {
-		return deps[i].Service < deps[j].Service
-	})
+	sort.Slice(
+		deps, func(i, j int) bool {
+			return deps[i].Service < deps[j].Service
+		},
+	)
 
-	return mAp(deps, func(item EdgeService, _ int) ExplainServiceDependencyOutput {
-		recursive := newExplainServiceDependencies(i, item, mode)
+	return mAp(
+		deps, func(item EdgeService, _ int) ExplainServiceDependencyOutput {
+			recursive := newExplainServiceDependencies(i, item, mode)
 
-		// @TODO: differenciate status of lazy services (built, not built). Such as: "😴 (✅)"
-		return ExplainServiceDependencyOutput{
-			ScopeID:   item.ScopeID,
-			ScopeName: item.ScopeName,
-			Service:   item.Service,
-			Recursive: recursive,
-		}
-	})
+			// @TODO: differenciate status of lazy services (built, not built). Such as: "😴 (✅)"
+			return ExplainServiceDependencyOutput{
+				ScopeID:   item.ScopeID,
+				ScopeName: item.ScopeName,
+				Service:   item.Service,
+				Recursive: recursive,
+			}
+		},
+	)
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -244,25 +262,29 @@ func mergeScopes(scopes *[]ExplainInjectorScopeOutput) string {
 	const prefixNotLastScopeContent = ` |   `
 
 	return strings.Join(
-		mAp(*scopes, func(item ExplainInjectorScopeOutput, i int) string {
-			isLastScope := i == nbrScopes-1
+		mAp(
+			*scopes, func(item ExplainInjectorScopeOutput, i int) string {
+				isLastScope := i == nbrScopes-1
 
-			lines := strings.Split(item.String(), "\n")
-			lines = mAp(lines, func(line string, j int) string {
-				if isLastScope && j == 0 {
-					return prefixLastScopeHeader + line
-				} else if isLastScope {
-					return prefixLastScopeContent + line
-				} else if j == 0 {
-					return prefixNotLastScopeHeader + line
-				} else {
-					return prefixNotLastScopeContent + line
-				}
-			})
+				lines := strings.Split(item.String(), "\n")
+				lines = mAp(
+					lines, func(line string, j int) string {
+						if isLastScope && j == 0 {
+							return prefixLastScopeHeader + line
+						} else if isLastScope {
+							return prefixLastScopeContent + line
+						} else if j == 0 {
+							return prefixNotLastScopeHeader + line
+						} else {
+							return prefixNotLastScopeContent + line
+						}
+					},
+				)
 
-			lines = append([]string{prefixScope, prefixScope}, lines...)
-			return strings.Join(lines, "\n")
-		}),
+				lines = append([]string{prefixScope, prefixScope}, lines...)
+				return strings.Join(lines, "\n")
+			},
+		),
 		"\n",
 	)
 }
@@ -280,9 +302,11 @@ type ExplainInjectorScopeOutput struct {
 
 func (ids *ExplainInjectorScopeOutput) String() string {
 	services := strings.Join(
-		mAp(ids.Services, func(item ExplainInjectorServiceOutput, _ int) string {
-			return item.String()
-		}),
+		mAp(
+			ids.Services, func(item ExplainInjectorServiceOutput, _ int) string {
+				return item.String()
+			},
+		),
 		"\n",
 	)
 	if len(ids.Services) > 0 {
@@ -362,7 +386,9 @@ func ExplainInjector(scope Injector) ExplainInjectorOutput {
 }
 
 // 2 modes are available: looping on ancestors, focused-scope or children
-func newExplainInjectorScopes(ancestors []Injector, children []Injector) []ExplainInjectorScopeOutput {
+func newExplainInjectorScopes(
+	ancestors []Injector, children []Injector,
+) []ExplainInjectorScopeOutput {
 	loopingOn := "children" // @TODO: create a real enum
 	injectors := children
 	if len(ancestors) > 0 {
@@ -376,69 +402,81 @@ func newExplainInjectorScopes(ancestors []Injector, children []Injector) []Expla
 	}
 
 	// order by id to have a deterministic output in unit tests
-	sort.Slice(injectors, func(i, j int) bool {
-		return injectors[i].ID() < injectors[j].ID()
-	})
+	sort.Slice(
+		injectors, func(i, j int) bool {
+			return injectors[i].ID() < injectors[j].ID()
+		},
+	)
 
-	return mAp(injectors, func(item Injector, _ int) ExplainInjectorScopeOutput {
-		nextChildren := children
-		if loopingOn == "children" {
-			nextChildren = castScopesToInjectors(item.Children())
-		}
+	return mAp(
+		injectors, func(item Injector, _ int) ExplainInjectorScopeOutput {
+			nextChildren := children
+			if loopingOn == "children" {
+				nextChildren = castScopesToInjectors(item.Children())
+			}
 
-		return ExplainInjectorScopeOutput{
-			ScopeID:   item.ID(),
-			ScopeName: item.Name(),
-			Scope:     item,
-			Services:  newExplainInjectorServices(item),
-			Children:  newExplainInjectorScopes(ancestors, nextChildren),
+			return ExplainInjectorScopeOutput{
+				ScopeID:   item.ID(),
+				ScopeName: item.Name(),
+				Scope:     item,
+				Services:  newExplainInjectorServices(item),
+				Children:  newExplainInjectorScopes(ancestors, nextChildren),
 
-			IsAncestor: loopingOn == "ancestors",
-			IsChildren: loopingOn == "children",
-		}
-	})
+				IsAncestor: loopingOn == "ancestors",
+				IsChildren: loopingOn == "children",
+			}
+		},
+	)
 }
 
 func newExplainInjectorServices(i Injector) []ExplainInjectorServiceOutput {
 	services := i.ListProvidedServices()
-	services = filter(services, func(item EdgeService, _ int) bool {
-		return i.serviceExist(item.Service)
-	})
+	services = filter(
+		services, func(item EdgeService, _ int) bool {
+			return i.serviceExist(item.Service)
+		},
+	)
 
 	// order by id to have a deterministic output in unit tests
-	sort.Slice(services, func(i, j int) bool {
-		return services[i].Service < services[j].Service
-	})
+	sort.Slice(
+		services, func(i, j int) bool {
+			return services[i].Service < services[j].Service
+		},
+	)
 
-	return mAp(services, func(item EdgeService, _ int) ExplainInjectorServiceOutput {
-		var serviceType ServiceType
-		var serviceTypeIcon string
-		var serviceBuildTime time.Duration
-		var isHealthchecker bool
-		var isShutdowner bool
+	return mAp(
+		services, func(item EdgeService, _ int) ExplainInjectorServiceOutput {
+			var serviceType ServiceType
+			var serviceTypeIcon string
+			var serviceBuildTime time.Duration
+			var isHealthchecker bool
+			var isShutdowner bool
 
-		if info, ok := inferServiceInfo(i, item.Service); ok {
-			// @TODO: differenciate status of lazy services (built, not built). Such as: "😴 (✅)"
-			serviceType = info.serviceType
-			serviceTypeIcon = serviceTypeToIcon[info.serviceType]
-			serviceBuildTime = info.serviceBuildTime
-			isHealthchecker = info.healthchecker
-			isShutdowner = info.shutdowner
-		}
+			if info, ok := inferServiceInfo(i, item.Service); ok {
+				// @TODO: differenciate status of lazy services (built, not built). Such as: "😴 (✅)"
+				serviceType = info.serviceType
+				serviceTypeIcon = serviceTypeToIcon[info.serviceType]
+				serviceBuildTime = info.serviceBuildTime
+				isHealthchecker = info.healthchecker
+				isShutdowner = info.shutdowner
+			}
 
-		return ExplainInjectorServiceOutput{
-			ServiceName:      item.Service,
-			ServiceType:      serviceType,
-			ServiceTypeIcon:  serviceTypeIcon,
-			ServiceBuildTime: serviceBuildTime,
-			IsHealthchecker:  isHealthchecker,
-			IsShutdowner:     isShutdowner,
-		}
-	})
+			return ExplainInjectorServiceOutput{
+				ServiceName:      item.Service,
+				ServiceType:      serviceType,
+				ServiceTypeIcon:  serviceTypeIcon,
+				ServiceBuildTime: serviceBuildTime,
+				IsHealthchecker:  isHealthchecker,
+				IsShutdowner:     isShutdowner,
+			}
+		},
+	)
 }
 
 func castScopesToInjectors(scopes []*Scope) []Injector {
-	return mAp(scopes, func(item *Scope, _ int) Injector {
-		return item
-	})
+	return mAp(
+		scopes, func(item *Scope, _ int) Injector {
+			return item
+		},
+	)
 }

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/samber/do/v2"
+	"github.com/nanostack-dev/do"
 )
 
 /**
@@ -51,16 +51,18 @@ func bootCarModule(injector do.Injector) {
 	do.ProvideNamedValue(injector, "wheel-4", &Wheel{})
 
 	// provide engine
-	do.Provide(injector, func(i do.Injector) (*Engine, error) {
-		return &Engine{
-			Wheels: []*Wheel{
-				do.MustInvokeNamed[*Wheel](i, "wheel-1"),
-				do.MustInvokeNamed[*Wheel](i, "wheel-2"),
-				do.MustInvokeNamed[*Wheel](i, "wheel-3"),
-				do.MustInvokeNamed[*Wheel](i, "wheel-4"),
-			},
-		}, nil
-	})
+	do.Provide(
+		injector, func(i do.Injector) (*Engine, error) {
+			return &Engine{
+				Wheels: []*Wheel{
+					do.MustInvokeNamed[*Wheel](i, "wheel-1"),
+					do.MustInvokeNamed[*Wheel](i, "wheel-2"),
+					do.MustInvokeNamed[*Wheel](i, "wheel-3"),
+					do.MustInvokeNamed[*Wheel](i, "wheel-4"),
+				},
+			}, nil
+		},
+	)
 
 	// provide seats
 	do.ProvideNamedValue(injector, "seat-1", &Seat{})

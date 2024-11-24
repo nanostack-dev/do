@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/samber/do/v2"
+	"github.com/nanostack-dev/do"
 )
 
 /**
@@ -59,30 +59,36 @@ func main() {
 	do.ProvideNamedValue(injector, "wheel-4", &Wheel{})
 
 	// provide car
-	do.Provide(injector, func(i do.Injector) (*Car, error) {
-		car := Car{
-			AutoPilot: do.MustInvoke[*AutoPilot](i),
-			Engine:    do.MustInvoke[*Engine](i),
-			Wheels: []*Wheel{
-				do.MustInvokeNamed[*Wheel](i, "wheel-1"),
-				do.MustInvokeNamed[*Wheel](i, "wheel-2"),
-				do.MustInvokeNamed[*Wheel](i, "wheel-3"),
-				do.MustInvokeNamed[*Wheel](i, "wheel-4"),
-			},
-		}
+	do.Provide(
+		injector, func(i do.Injector) (*Car, error) {
+			car := Car{
+				AutoPilot: do.MustInvoke[*AutoPilot](i),
+				Engine:    do.MustInvoke[*Engine](i),
+				Wheels: []*Wheel{
+					do.MustInvokeNamed[*Wheel](i, "wheel-1"),
+					do.MustInvokeNamed[*Wheel](i, "wheel-2"),
+					do.MustInvokeNamed[*Wheel](i, "wheel-3"),
+					do.MustInvokeNamed[*Wheel](i, "wheel-4"),
+				},
+			}
 
-		return &car, nil
-	})
+			return &car, nil
+		},
+	)
 
 	// provide engine
-	do.Provide(injector, func(i do.Injector) (*Engine, error) {
-		return &Engine{}, nil
-	})
+	do.Provide(
+		injector, func(i do.Injector) (*Engine, error) {
+			return &Engine{}, nil
+		},
+	)
 
 	// provide autopilot
-	do.Provide(injector, func(i do.Injector) (*AutoPilot, error) {
-		return &AutoPilot{}, nil
-	})
+	do.Provide(
+		injector, func(i do.Injector) (*AutoPilot, error) {
+			return &AutoPilot{}, nil
+		},
+	)
 
 	// start car
 	car := do.MustInvoke[*Car](injector)

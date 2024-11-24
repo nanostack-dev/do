@@ -1,10 +1,12 @@
 package http
 
 import (
-	"github.com/samber/do/v2"
+	"github.com/nanostack-dev/do"
 )
 
-func ServiceHTML(basePath string, injector do.Injector, scopeID string, serviceName string) (string, error) {
+func ServiceHTML(basePath string, injector do.Injector, scopeID string, serviceName string) (
+	string, error,
+) {
 	scope, ok := getScopeByID(injector, scopeID)
 	if !ok {
 		return ServiceListHTML(basePath, injector)
@@ -94,13 +96,15 @@ func serviceToHTML(basePath string, services []do.ExplainServiceDependencyOutput
 	`,
 		map[string]any{
 			"BasePath": basePath,
-			"Services": mAp(services, func(service do.ExplainServiceDependencyOutput) map[string]any {
-				return map[string]any{
-					"ScopeID":     service.ScopeID,
-					"ServiceName": service.Service,
-					"Recursive":   serviceToHTML(basePath, service.Recursive),
-				}
-			}),
+			"Services": mAp(
+				services, func(service do.ExplainServiceDependencyOutput) map[string]any {
+					return map[string]any{
+						"ScopeID":     service.ScopeID,
+						"ServiceName": service.Service,
+						"Recursive":   serviceToHTML(basePath, service.Recursive),
+					}
+				},
+			),
 		},
 	)
 	return output
@@ -143,9 +147,11 @@ func ServiceListHTML(basePath string, injector do.Injector) (string, error) {
 </html>`,
 		map[string]any{
 			"BasePath": basePath,
-			"Scopes": mAp(scopes, func(item do.ExplainInjectorScopeOutput) string {
-				return serviceListScopeToHTML(basePath, item)
-			}),
+			"Scopes": mAp(
+				scopes, func(item do.ExplainInjectorScopeOutput) string {
+					return serviceListScopeToHTML(basePath, item)
+				},
+			),
 		},
 	)
 }
@@ -172,15 +178,19 @@ func serviceListScopeToHTML(basePath string, description do.ExplainInjectorScope
 			"BasePath":  basePath,
 			"ScopeID":   description.ScopeID,
 			"ScopeName": description.ScopeName,
-			"Services": mAp(description.Services, func(item do.ExplainInjectorServiceOutput) string {
-				return serviceListServiceToHTML(basePath, description.ScopeID, item)
-			}),
+			"Services": mAp(
+				description.Services, func(item do.ExplainInjectorServiceOutput) string {
+					return serviceListServiceToHTML(basePath, description.ScopeID, item)
+				},
+			),
 		},
 	)
 	return html
 }
 
-func serviceListServiceToHTML(basePath string, scopeID string, description do.ExplainInjectorServiceOutput) string {
+func serviceListServiceToHTML(
+	basePath string, scopeID string, description do.ExplainInjectorServiceOutput,
+) string {
 	featuresIcons := ""
 
 	if description.IsHealthchecker {

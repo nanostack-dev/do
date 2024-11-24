@@ -12,10 +12,10 @@ func TestNameOf(t *testing.T) {
 	is := assert.New(t)
 
 	is.Equal("int", NameOf[int]())
-	is.Equal("github.com/samber/do/v2.eagerTest", NameOf[eagerTest]())
-	is.Equal("*github.com/samber/do/v2.eagerTest", NameOf[*eagerTest]())
+	is.Equal("github.com/nanostack-dev/do.eagerTest", NameOf[eagerTest]())
+	is.Equal("*github.com/nanostack-dev/do.eagerTest", NameOf[*eagerTest]())
 	is.Equal("*map[int]bool", NameOf[*map[int]bool]())
-	is.Equal("github.com/samber/do/v2.Service[int]", NameOf[Service[int]]())
+	is.Equal("github.com/nanostack-dev/do.Service[int]", NameOf[Service[int]]())
 }
 
 func TestProvide(t *testing.T) {
@@ -25,44 +25,52 @@ func TestProvide(t *testing.T) {
 
 	i := New()
 
-	Provide(i, func(i Injector) (*test, error) {
-		return &test{}, nil
-	})
+	Provide(
+		i, func(i Injector) (*test, error) {
+			return &test{}, nil
+		},
+	)
 
-	Provide(i, func(i Injector) (test, error) {
-		return test{}, fmt.Errorf("error")
-	})
-
-	is.Panics(func() {
-		// try to erase previous instance
-		Provide(i, func(i Injector) (test, error) {
+	Provide(
+		i, func(i Injector) (test, error) {
 			return test{}, fmt.Errorf("error")
-		})
-	})
+		},
+	)
+
+	is.Panics(
+		func() {
+			// try to erase previous instance
+			Provide(
+				i, func(i Injector) (test, error) {
+					return test{}, fmt.Errorf("error")
+				},
+			)
+		},
+	)
 
 	is.Len(i.self.services, 2)
 
-	s1, ok1 := i.self.services["*github.com/samber/do/v2.test"]
+	s1, ok1 := i.self.services["*github.com/nanostack-dev/do.test"]
 	is.True(ok1)
 	if ok1 {
 		s, ok := s1.(Service[*test])
 		is.True(ok)
 		if ok {
-			is.Equal("*github.com/samber/do/v2.test", s.getName())
+			is.Equal("*github.com/nanostack-dev/do.test", s.getName())
 		}
 	}
 
-	s2, ok2 := i.self.services["github.com/samber/do/v2.test"]
+	s2, ok2 := i.self.services["github.com/nanostack-dev/do.test"]
 	is.True(ok2)
 	if ok2 {
 		s, ok := s2.(Service[test])
 		is.True(ok)
 		if ok {
-			is.Equal("github.com/samber/do/v2.test", s.getName())
+			is.Equal("github.com/nanostack-dev/do.test", s.getName())
 		}
 	}
 
-	_, ok3 := i.self.services["github.com/samber/do/v2.*plop"]
+	_, ok3 := i.self.services["github.com/nanostack-dev/do.*plop"]
 	is.False(ok3)
 
 	// @TODO: check that all services share the same references
@@ -75,20 +83,28 @@ func TestProvideNamed(t *testing.T) {
 
 	i := New()
 
-	ProvideNamed(i, "*foobar", func(i Injector) (*test, error) {
-		return &test{}, nil
-	})
+	ProvideNamed(
+		i, "*foobar", func(i Injector) (*test, error) {
+			return &test{}, nil
+		},
+	)
 
-	ProvideNamed(i, "foobar", func(i Injector) (test, error) {
-		return test{}, fmt.Errorf("error")
-	})
-
-	is.Panics(func() {
-		// try to erase previous instance
-		ProvideNamed(i, "foobar", func(i Injector) (test, error) {
+	ProvideNamed(
+		i, "foobar", func(i Injector) (test, error) {
 			return test{}, fmt.Errorf("error")
-		})
-	})
+		},
+	)
+
+	is.Panics(
+		func() {
+			// try to erase previous instance
+			ProvideNamed(
+				i, "foobar", func(i Injector) (test, error) {
+					return test{}, fmt.Errorf("error")
+				},
+			)
+		},
+	)
 
 	is.Len(i.self.services, 2)
 
@@ -146,13 +162,13 @@ func TestProvideValue(t *testing.T) {
 		}
 	}
 
-	s2, ok2 := i.self.services["github.com/samber/do/v2.test"]
+	s2, ok2 := i.self.services["github.com/nanostack-dev/do.test"]
 	is.True(ok2)
 	if ok2 {
 		s, ok := s2.(Service[test])
 		is.True(ok)
 		if ok {
-			is.Equal("github.com/samber/do/v2.test", s.getName())
+			is.Equal("github.com/nanostack-dev/do.test", s.getName())
 			instance, err := s.getInstance(i)
 			is.EqualValues(_test, instance)
 			is.Nil(err)
@@ -213,44 +229,52 @@ func TestProvideTransient(t *testing.T) {
 
 	i := New()
 
-	ProvideTransient(i, func(i Injector) (*test, error) {
-		return &test{}, nil
-	})
+	ProvideTransient(
+		i, func(i Injector) (*test, error) {
+			return &test{}, nil
+		},
+	)
 
-	ProvideTransient(i, func(i Injector) (test, error) {
-		return test{}, fmt.Errorf("error")
-	})
-
-	is.Panics(func() {
-		// try to erase previous instance
-		Provide(i, func(i Injector) (test, error) {
+	ProvideTransient(
+		i, func(i Injector) (test, error) {
 			return test{}, fmt.Errorf("error")
-		})
-	})
+		},
+	)
+
+	is.Panics(
+		func() {
+			// try to erase previous instance
+			Provide(
+				i, func(i Injector) (test, error) {
+					return test{}, fmt.Errorf("error")
+				},
+			)
+		},
+	)
 
 	is.Len(i.self.services, 2)
 
-	s1, ok1 := i.self.services["*github.com/samber/do/v2.test"]
+	s1, ok1 := i.self.services["*github.com/nanostack-dev/do.test"]
 	is.True(ok1)
 	if ok1 {
 		s, ok := s1.(Service[*test])
 		is.True(ok)
 		if ok {
-			is.Equal("*github.com/samber/do/v2.test", s.getName())
+			is.Equal("*github.com/nanostack-dev/do.test", s.getName())
 		}
 	}
 
-	s2, ok2 := i.self.services["github.com/samber/do/v2.test"]
+	s2, ok2 := i.self.services["github.com/nanostack-dev/do.test"]
 	is.True(ok2)
 	if ok2 {
 		s, ok := s2.(Service[test])
 		is.True(ok)
 		if ok {
-			is.Equal("github.com/samber/do/v2.test", s.getName())
+			is.Equal("github.com/nanostack-dev/do.test", s.getName())
 		}
 	}
 
-	_, ok3 := i.self.services["github.com/samber/do/v2.*plop"]
+	_, ok3 := i.self.services["github.com/nanostack-dev/do.*plop"]
 	is.False(ok3)
 
 	// @TODO: check that all services share the same references
@@ -263,20 +287,28 @@ func TestProvideNamedTransient(t *testing.T) {
 
 	i := New()
 
-	ProvideNamed(i, "*foobar", func(i Injector) (*test, error) {
-		return &test{}, nil
-	})
+	ProvideNamed(
+		i, "*foobar", func(i Injector) (*test, error) {
+			return &test{}, nil
+		},
+	)
 
-	ProvideNamed(i, "foobar", func(i Injector) (test, error) {
-		return test{}, fmt.Errorf("error")
-	})
-
-	is.Panics(func() {
-		// try to erase previous instance
-		ProvideNamed(i, "foobar", func(i Injector) (test, error) {
+	ProvideNamed(
+		i, "foobar", func(i Injector) (test, error) {
 			return test{}, fmt.Errorf("error")
-		})
-	})
+		},
+	)
+
+	is.Panics(
+		func() {
+			// try to erase previous instance
+			ProvideNamed(
+				i, "foobar", func(i Injector) (test, error) {
+					return test{}, fmt.Errorf("error")
+				},
+			)
+		},
+	)
 
 	is.Len(i.self.services, 2)
 
@@ -313,16 +345,20 @@ func TestProvide_race(t *testing.T) {
 	wg.Add(2)
 
 	go func() {
-		Provide(injector, func(i Injector) (int, error) {
-			return 42, nil
-		})
+		Provide(
+			injector, func(i Injector) (int, error) {
+				return 42, nil
+			},
+		)
 		wg.Done()
 	}()
 
 	go func() {
-		Provide(injector, func(i Injector) (*lazyTest, error) {
-			return &lazyTest{}, nil
-		})
+		Provide(
+			injector, func(i Injector) (*lazyTest, error) {
+				return &lazyTest{}, nil
+			},
+		)
 		wg.Done()
 	}()
 
@@ -338,28 +374,34 @@ func TestOverride(t *testing.T) {
 
 	i := New()
 
-	is.NotPanics(func() {
-		Provide(i, func(i Injector) (*test, error) {
-			return &test{42}, nil
-		})
-		is.Equal(42, MustInvoke[*test](i).foobar)
+	is.NotPanics(
+		func() {
+			Provide(
+				i, func(i Injector) (*test, error) {
+					return &test{42}, nil
+				},
+			)
+			is.Equal(42, MustInvoke[*test](i).foobar)
 
-		Override(i, func(i Injector) (*test, error) {
-			return &test{1}, nil
-		})
-		is.Equal(1, MustInvoke[*test](i).foobar)
+			Override(
+				i, func(i Injector) (*test, error) {
+					return &test{1}, nil
+				},
+			)
+			is.Equal(1, MustInvoke[*test](i).foobar)
 
-		// OverrideNamed(i, "*github.com/samber/do/v2.test", func(i Injector) (*test, error) {
-		// 	return &test{2}, nil
-		// })
-		// is.Equal(2, MustInvoke[*test](i).foobar)
+			// OverrideNamed(i, "*github.com/nanostack-dev/do.test", func(i Injector) (*test, error) {
+			// 	return &test{2}, nil
+			// })
+			// is.Equal(2, MustInvoke[*test](i).foobar)
 
-		// OverrideValue(i, &test{3})
-		// is.Equal(3, MustInvoke[*test](i).foobar)
+			// OverrideValue(i, &test{3})
+			// is.Equal(3, MustInvoke[*test](i).foobar)
 
-		// OverrideNamedValue(i, "*github.com/samber/do/v2.test", &test{4})
-		// is.Equal(4, MustInvoke[*test](i).foobar)
-	})
+			// OverrideNamedValue(i, "*github.com/nanostack-dev/do.test", &test{4})
+			// is.Equal(4, MustInvoke[*test](i).foobar)
+		},
+	)
 }
 
 func TestOverrideNamed(t *testing.T) {
@@ -371,14 +413,18 @@ func TestOverrideNamed(t *testing.T) {
 
 	i := New()
 
-	Provide(i, func(i Injector) (*test, error) {
-		return &test{42}, nil
-	})
+	Provide(
+		i, func(i Injector) (*test, error) {
+			return &test{42}, nil
+		},
+	)
 	is.Equal(42, MustInvoke[*test](i).foobar)
 
-	OverrideNamed(i, "*github.com/samber/do/v2.test", func(i Injector) (*test, error) {
-		return &test{2}, nil
-	})
+	OverrideNamed(
+		i, "*github.com/nanostack-dev/do.test", func(i Injector) (*test, error) {
+			return &test{2}, nil
+		},
+	)
 	is.Equal(2, MustInvoke[*test](i).foobar)
 }
 
@@ -391,14 +437,18 @@ func TestOverrideValue(t *testing.T) {
 
 	i := New()
 
-	Provide(i, func(i Injector) (*test, error) {
-		return &test{42}, nil
-	})
+	Provide(
+		i, func(i Injector) (*test, error) {
+			return &test{42}, nil
+		},
+	)
 	is.Equal(42, MustInvoke[*test](i).foobar)
 
-	OverrideNamed(i, "*github.com/samber/do/v2.test", func(i Injector) (*test, error) {
-		return &test{2}, nil
-	})
+	OverrideNamed(
+		i, "*github.com/nanostack-dev/do.test", func(i Injector) (*test, error) {
+			return &test{2}, nil
+		},
+	)
 	is.Equal(2, MustInvoke[*test](i).foobar)
 }
 
@@ -411,12 +461,14 @@ func TestOverrideNamedValue(t *testing.T) {
 
 	i := New()
 
-	Provide(i, func(i Injector) (*test, error) {
-		return &test{42}, nil
-	})
+	Provide(
+		i, func(i Injector) (*test, error) {
+			return &test{42}, nil
+		},
+	)
 	is.Equal(42, MustInvoke[*test](i).foobar)
 
-	OverrideNamedValue(i, "*github.com/samber/do/v2.test", &test{4})
+	OverrideNamedValue(i, "*github.com/nanostack-dev/do.test", &test{4})
 	is.Equal(4, MustInvoke[*test](i).foobar)
 }
 
@@ -437,13 +489,15 @@ func TestInvoke(t *testing.T) {
 
 	i := New()
 
-	Provide(i, func(i Injector) (test, error) {
-		return test{foobar: "foobar"}, nil
-	})
+	Provide(
+		i, func(i Injector) (test, error) {
+			return test{foobar: "foobar"}, nil
+		},
+	)
 
 	is.Len(i.self.services, 1)
 
-	s0a, ok0a := i.self.services["github.com/samber/do/v2.test"]
+	s0a, ok0a := i.self.services["github.com/nanostack-dev/do.test"]
 	is.True(ok0a)
 
 	s0b, ok0b := s0a.(*serviceLazy[test])
@@ -478,20 +532,26 @@ func TestMustInvoke(t *testing.T) {
 	}
 	_test := test{foobar: "foobar"}
 
-	Provide(i, func(i Injector) (test, error) {
-		return _test, nil
-	})
+	Provide(
+		i, func(i Injector) (test, error) {
+			return _test, nil
+		},
+	)
 
 	is.Len(i.self.services, 1)
 
-	is.Panics(func() {
-		_ = MustInvoke[string](i)
-	})
+	is.Panics(
+		func() {
+			_ = MustInvoke[string](i)
+		},
+	)
 
-	is.NotPanics(func() {
-		instance1 := MustInvoke[test](i)
-		is.EqualValues(_test, instance1)
-	})
+	is.NotPanics(
+		func() {
+			instance1 := MustInvoke[test](i)
+			is.EqualValues(_test, instance1)
+		},
+	)
 }
 
 func TestInvokeNamed(t *testing.T) {
@@ -531,7 +591,9 @@ func TestInvokeNamed(t *testing.T) {
 	is.Equal(instance2, instance2any)
 
 	instance3, err3 := InvokeNamed[string](i, "foobar")
-	is.EqualError(err3, "DI: service found, but type mismatch: invoking `string` but registered `int`")
+	is.EqualError(
+		err3, "DI: service found, but type mismatch: invoking `string` but registered `int`",
+	)
 	is.EqualValues("", instance3)
 }
 
@@ -544,18 +606,24 @@ func TestMustInvokeNamed(t *testing.T) {
 
 	is.Len(i.self.services, 1)
 
-	is.Panics(func() {
-		_ = MustInvokeNamed[string](i, "hello")
-	})
+	is.Panics(
+		func() {
+			_ = MustInvokeNamed[string](i, "hello")
+		},
+	)
 
-	is.Panics(func() {
-		_ = MustInvokeNamed[string](i, "foobar")
-	})
+	is.Panics(
+		func() {
+			_ = MustInvokeNamed[string](i, "foobar")
+		},
+	)
 
-	is.NotPanics(func() {
-		instance1 := MustInvokeNamed[int](i, "foobar")
-		is.EqualValues(42, instance1)
-	})
+	is.NotPanics(
+		func() {
+			instance1 := MustInvokeNamed[int](i, "foobar")
+			is.EqualValues(42, instance1)
+		},
+	)
 }
 
 func TestInvokeStruct(t *testing.T) {
@@ -595,7 +663,11 @@ func TestInvokeStruct(t *testing.T) {
 		eagerTest *hasNonExportedEagerTestDependency `do:""` //nolint:unused
 	}
 	test4, err := InvokeStruct[dependencyNotFound](i)
-	is.Equal(serviceNotFound(i, ErrServiceNotFound, []string{inferServiceName[*hasNonExportedEagerTestDependency]()}).Error(), err.Error())
+	is.Equal(
+		serviceNotFound(
+			i, ErrServiceNotFound, []string{inferServiceName[*hasNonExportedEagerTestDependency]()},
+		).Error(), err.Error(),
+	)
 	is.Nil(test4)
 
 	// use tag
@@ -603,7 +675,10 @@ func TestInvokeStruct(t *testing.T) {
 		eagerTest *eagerTest `do:"int"` //nolint:unused
 	}
 	test5, err := InvokeStruct[namedDependency](i)
-	is.Equal(serviceNotFound(i, ErrServiceNotFound, []string{inferServiceName[int]()}).Error(), err.Error())
+	is.Equal(
+		serviceNotFound(i, ErrServiceNotFound, []string{inferServiceName[int]()}).Error(),
+		err.Error(),
+	)
 	is.Nil(test5)
 
 	// named service
@@ -617,10 +692,13 @@ func TestInvokeStruct(t *testing.T) {
 
 	// use tag but wrong type
 	type namedDependencyButTypeMismatch struct {
-		EagerTest *int `do:"*github.com/samber/do/v2.eagerTest"`
+		EagerTest *int `do:"*github.com/nanostack-dev/do.eagerTest"`
 	}
 	test7, err := InvokeStruct[namedDependencyButTypeMismatch](i)
-	is.Equal("DI: field `github.com/samber/do/v2.namedDependencyButTypeMismatch.EagerTest` is not assignable to service *github.com/samber/do/v2.eagerTest", err.Error())
+	is.Equal(
+		"DI: field `github.com/nanostack-dev/do.namedDependencyButTypeMismatch.EagerTest` is not assignable to service *github.com/nanostack-dev/do.eagerTest",
+		err.Error(),
+	)
 	is.Nil(test7)
 
 	// use a custom tag
@@ -643,13 +721,17 @@ func TestMustInvokeStruct(t *testing.T) {
 		EagerTest int `do:"foobar"`
 	}
 
-	is.Panics(func() {
-		_ = MustInvokeStruct[namedServiceWithCustomTag](i)
-	})
+	is.Panics(
+		func() {
+			_ = MustInvokeStruct[namedServiceWithCustomTag](i)
+		},
+	)
 
 	ProvideNamedValue(i, "foobar", 42)
-	is.NotPanics(func() {
-		test := MustInvokeStruct[namedServiceWithCustomTag](i)
-		is.Equal(42, test.EagerTest)
-	})
+	is.NotPanics(
+		func() {
+			test := MustInvokeStruct[namedServiceWithCustomTag](i)
+			is.Equal(42, test.EagerTest)
+		},
+	)
 }

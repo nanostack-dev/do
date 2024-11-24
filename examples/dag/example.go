@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/samber/do/v2"
+	"github.com/nanostack-dev/do"
 )
 
 /**
@@ -45,24 +45,28 @@ func main() {
 	scope := injector.RootScope().Scope("child")
 
 	// provide car
-	do.Provide(scope, func(i do.Injector) (*Car, error) {
-		car := Car{
-			Engine: do.MustInvoke[*Engine](i),
-			Wheels: []*Wheel{
-				do.MustInvokeNamed[*Wheel](i, "wheel-1"),
-				do.MustInvokeNamed[*Wheel](i, "wheel-2"),
-				do.MustInvokeNamed[*Wheel](i, "wheel-3"),
-				do.MustInvokeNamed[*Wheel](i, "wheel-4"),
-			},
-		}
+	do.Provide(
+		scope, func(i do.Injector) (*Car, error) {
+			car := Car{
+				Engine: do.MustInvoke[*Engine](i),
+				Wheels: []*Wheel{
+					do.MustInvokeNamed[*Wheel](i, "wheel-1"),
+					do.MustInvokeNamed[*Wheel](i, "wheel-2"),
+					do.MustInvokeNamed[*Wheel](i, "wheel-3"),
+					do.MustInvokeNamed[*Wheel](i, "wheel-4"),
+				},
+			}
 
-		return &car, nil
-	})
+			return &car, nil
+		},
+	)
 
 	// provide engine
-	do.Provide(injector, func(i do.Injector) (*Engine, error) {
-		return &Engine{}, nil
-	})
+	do.Provide(
+		injector, func(i do.Injector) (*Engine, error) {
+			return &Engine{}, nil
+		},
+	)
 
 	fmt.Println("root scope -->", injector.ID(), injector.ListProvidedServices())
 	fmt.Println("child scope -->", scope.ID(), scope.ListProvidedServices())

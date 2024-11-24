@@ -1,22 +1,22 @@
-module github.com/samber/do/v2/examples/http/echo
+module github.com/nanostack-dev/do/examples/http/echo
 
 go 1.18
 
-replace github.com/samber/do/v2 => ../../../
+replace github.com/nanostack-dev/do => ../../../
 
 replace github.com/samber/do/http/echo/v2 => ../../../http/echo
 
 require (
 	github.com/labstack/echo/v4 v4.11.4
-	github.com/samber/do/v2 v2.0.0-00010101000000-000000000000
 	github.com/samber/do/http/echo/v2 v2.0.0-00010101000000-000000000000
+	github.com/nanostack-dev/do v2.0.0-00010101000000-000000000000
 )
 
 require (
 	github.com/labstack/gommon v0.4.2 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/samber/go-type-to-string v1.1.0 // indirect
+	github.com/samber/go-type-to-string v1.6.1 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	golang.org/x/crypto v0.17.0 // indirect

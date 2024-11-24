@@ -11,7 +11,7 @@ sidebar_position: 2
 The simplest way to start is to use the default parameters:
 
 ```go
-import "github.com/samber/do/v2"
+import "github.com/nanostack-dev/do"
 
 injector := do.New()
 ```
@@ -21,7 +21,7 @@ injector := do.New()
 For a quick start, you may use the default global container. This is highly discouraged in production.
 
 ```go
-import "github.com/samber/do/v2"
+import "github.com/nanostack-dev/do"
 
 do.Provide(nil, ...)
 do.Invoke(nil, ...)
@@ -58,7 +58,7 @@ injector := do.New(stores.Package)
 ## Custom options
 
 ```go
-import "github.com/samber/do/v2"
+import "github.com/nanostack-dev/do"
 
 injector := do.NewWithOps(&do.InjectorOpts{
     HookBeforeRegistration []func(scope *do.Scope, serviceName string),

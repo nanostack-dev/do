@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/samber/do/v2"
+	"github.com/nanostack-dev/do"
 )
 
 func main() {

@@ -4,43 +4,49 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/samber/do/v2"
-	dohttp "github.com/samber/do/v2/http"
+	"github.com/nanostack-dev/do"
+	dohttp "github.com/nanostack-dev/do/http"
 )
 
 func Use(router *gin.RouterGroup, injector do.Injector) {
 	basePathDo := router.BasePath()
 
-	router.Handle("GET", "", func(c *gin.Context) {
-		output, err := dohttp.IndexHTML(basePathDo)
-		response(c, output, err)
-	})
-
-	router.Handle("GET", "/scope", func(c *gin.Context) {
-		scopeID := c.Query("scope_id")
-		if scopeID == "" {
-			url := fmt.Sprintf("%s/scope?scope_id=%s", basePathDo, injector.ID())
-			c.Redirect(302, url)
-			return
-		}
-
-		output, err := dohttp.ScopeTreeHTML(basePathDo, injector, scopeID)
-		response(c, output, err)
-	})
-
-	router.Handle("GET", "/service", func(c *gin.Context) {
-		scopeID := c.Query("scope_id")
-		serviceName := c.Query("service_name")
-
-		if scopeID == "" || serviceName == "" {
-			output, err := dohttp.ServiceListHTML(basePathDo, injector)
+	router.Handle(
+		"GET", "", func(c *gin.Context) {
+			output, err := dohttp.IndexHTML(basePathDo)
 			response(c, output, err)
-			return
-		}
+		},
+	)
 
-		output, err := dohttp.ServiceHTML(basePathDo, injector, scopeID, serviceName)
-		response(c, output, err)
-	})
+	router.Handle(
+		"GET", "/scope", func(c *gin.Context) {
+			scopeID := c.Query("scope_id")
+			if scopeID == "" {
+				url := fmt.Sprintf("%s/scope?scope_id=%s", basePathDo, injector.ID())
+				c.Redirect(302, url)
+				return
+			}
+
+			output, err := dohttp.ScopeTreeHTML(basePathDo, injector, scopeID)
+			response(c, output, err)
+		},
+	)
+
+	router.Handle(
+		"GET", "/service", func(c *gin.Context) {
+			scopeID := c.Query("scope_id")
+			serviceName := c.Query("service_name")
+
+			if scopeID == "" || serviceName == "" {
+				output, err := dohttp.ServiceListHTML(basePathDo, injector)
+				response(c, output, err)
+				return
+			}
+
+			output, err := dohttp.ServiceHTML(basePathDo, injector, scopeID, serviceName)
+			response(c, output, err)
+		},
+	)
 }
 
 func response(c *gin.Context, data string, err error) {

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/samber/do/v2"
+	"github.com/nanostack-dev/do"
 )
 
 /**
@@ -23,10 +23,12 @@ func (d *Driver) Shutdown() {
 
 func bootDriverModule(injector do.Injector) {
 	// provide driver
-	do.Provide(injector, func(i do.Injector) (*Driver, error) {
-		return &Driver{
-			Seat:   do.MustInvokeNamed[*Seat](i, "seat-1"),
-			Engine: do.MustInvoke[*Engine](i),
-		}, nil
-	})
+	do.Provide(
+		injector, func(i do.Injector) (*Driver, error) {
+			return &Driver{
+				Seat:   do.MustInvokeNamed[*Seat](i, "seat-1"),
+				Engine: do.MustInvoke[*Engine](i),
+			}, nil
+		},
+	)
 }

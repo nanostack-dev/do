@@ -93,7 +93,7 @@ func TestServiceTransient_getTypeName(t *testing.T) {
 	is.Equal("int", service1.getTypeName())
 
 	service2 := newServiceTransient("foobar2", provider2)
-	is.Equal("github.com/samber/do/v2.transientTest", service2.getTypeName())
+	is.Equal("github.com/nanostack-dev/do.transientTest", service2.getTypeName())
 }
 
 func TestServiceTransient_getServiceType(t *testing.T) {
@@ -120,9 +120,11 @@ func TestServiceTransient_getEmptyInstance(t *testing.T) {
 	t.Parallel()
 	is := assert.New(t)
 
-	svc := newServiceTransient("foobar", func(i Injector) (*transientTest, error) {
-		return &transientTest{foobar: "foobar"}, nil
-	})
+	svc := newServiceTransient(
+		"foobar", func(i Injector) (*transientTest, error) {
+			return &transientTest{foobar: "foobar"}, nil
+		},
+	)
 	is.Empty(svc.getEmptyInstance())
 	is.EqualValues((*transientTest)(nil), svc.getEmptyInstance())
 }
@@ -164,30 +166,36 @@ func TestServiceTransient_getInstanceAny(t *testing.T) {
 	is.Equal(test, instance2)
 
 	// provider panics, but panic is catched by getInstanceAny
-	is.NotPanics(func() {
-		service3 := newServiceTransient("baz", provider3)
-		_, _ = service3.getInstanceAny(i)
-	})
+	is.NotPanics(
+		func() {
+			service3 := newServiceTransient("baz", provider3)
+			_, _ = service3.getInstanceAny(i)
+		},
+	)
 
 	// provider panics, but panic is catched by getInstanceAny
-	is.NotPanics(func() {
-		service4 := newServiceTransient("plop", provider4)
-		instance4, err4 := service4.getInstanceAny(i)
-		is.NotNil(err4)
-		is.Empty(instance4)
-		expected := fmt.Errorf("error")
-		is.Equal(expected, err4)
-	})
+	is.NotPanics(
+		func() {
+			service4 := newServiceTransient("plop", provider4)
+			instance4, err4 := service4.getInstanceAny(i)
+			is.NotNil(err4)
+			is.Empty(instance4)
+			expected := fmt.Errorf("error")
+			is.Equal(expected, err4)
+		},
+	)
 
 	// provider returning error
-	is.NotPanics(func() {
-		service5 := newServiceTransient("plop", provider5)
-		instance5, err5 := service5.getInstanceAny(i)
-		is.NotNil(err5)
-		is.Empty(instance5)
-		expected := fmt.Errorf("error")
-		is.Equal(expected, err5)
-	})
+	is.NotPanics(
+		func() {
+			service5 := newServiceTransient("plop", provider5)
+			instance5, err5 := service5.getInstanceAny(i)
+			is.NotNil(err5)
+			is.Empty(instance5)
+			expected := fmt.Errorf("error")
+			is.Equal(expected, err5)
+		},
+	)
 }
 
 func TestServiceTransient_getInstance(t *testing.T) {
@@ -227,30 +235,36 @@ func TestServiceTransient_getInstance(t *testing.T) {
 	is.Equal(test, instance2)
 
 	// provider panics, but panic is catched by getInstance
-	is.NotPanics(func() {
-		service3 := newServiceTransient("baz", provider3)
-		_, _ = service3.getInstance(i)
-	})
+	is.NotPanics(
+		func() {
+			service3 := newServiceTransient("baz", provider3)
+			_, _ = service3.getInstance(i)
+		},
+	)
 
 	// provider panics, but panic is catched by getInstance
-	is.NotPanics(func() {
-		service4 := newServiceTransient("plop", provider4)
-		instance4, err4 := service4.getInstance(i)
-		is.NotNil(err4)
-		is.Empty(instance4)
-		expected := fmt.Errorf("error")
-		is.Equal(expected, err4)
-	})
+	is.NotPanics(
+		func() {
+			service4 := newServiceTransient("plop", provider4)
+			instance4, err4 := service4.getInstance(i)
+			is.NotNil(err4)
+			is.Empty(instance4)
+			expected := fmt.Errorf("error")
+			is.Equal(expected, err4)
+		},
+	)
 
 	// provider returning error
-	is.NotPanics(func() {
-		service5 := newServiceTransient("plop", provider5)
-		instance5, err5 := service5.getInstance(i)
-		is.NotNil(err5)
-		is.Empty(instance5)
-		expected := fmt.Errorf("error")
-		is.Equal(expected, err5)
-	})
+	is.NotPanics(
+		func() {
+			service5 := newServiceTransient("plop", provider5)
+			instance5, err5 := service5.getInstance(i)
+			is.NotNil(err5)
+			is.Empty(instance5)
+			expected := fmt.Errorf("error")
+			is.Equal(expected, err5)
+		},
+	)
 }
 
 // @TODO: missing tests for context
@@ -259,23 +273,29 @@ func TestServiceTransient_isHealthchecker(t *testing.T) {
 	is := assert.New(t)
 
 	// no healthcheck
-	service1 := newServiceTransient("foobar", func(i Injector) (lazyTest, error) {
-		return lazyTest{foobar: "foobar"}, nil
-	})
+	service1 := newServiceTransient(
+		"foobar", func(i Injector) (lazyTest, error) {
+			return lazyTest{foobar: "foobar"}, nil
+		},
+	)
 	is.False(service1.isHealthchecker())
 
 	// healthcheck ok
-	service2 := newServiceTransient("foobar", func(i Injector) (*lazyTestHeathcheckerOK, error) {
-		return &lazyTestHeathcheckerOK{foobar: "foobar"}, nil
-	})
+	service2 := newServiceTransient(
+		"foobar", func(i Injector) (*lazyTestHeathcheckerOK, error) {
+			return &lazyTestHeathcheckerOK{foobar: "foobar"}, nil
+		},
+	)
 	is.False(service2.isHealthchecker())
 	_, _ = service2.getInstance(nil)
 	is.False(service2.isHealthchecker())
 
 	// healthcheck ko
-	service3 := newServiceTransient("foobar", func(i Injector) (*lazyTestHeathcheckerKO, error) {
-		return &lazyTestHeathcheckerKO{foobar: "foobar"}, nil
-	})
+	service3 := newServiceTransient(
+		"foobar", func(i Injector) (*lazyTestHeathcheckerKO, error) {
+			return &lazyTestHeathcheckerKO{foobar: "foobar"}, nil
+		},
+	)
 	is.False(service3.isHealthchecker())
 	_, _ = service3.getInstance(nil)
 	is.False(service3.isHealthchecker())
@@ -289,25 +309,31 @@ func TestServiceTransient_healthcheck(t *testing.T) {
 	ctx := context.Background()
 
 	// no healthcheck
-	service1 := newServiceTransient("foobar", func(i Injector) (lazyTest, error) {
-		return lazyTest{foobar: "foobar"}, nil
-	})
+	service1 := newServiceTransient(
+		"foobar", func(i Injector) (lazyTest, error) {
+			return lazyTest{foobar: "foobar"}, nil
+		},
+	)
 	is.Nil(service1.healthcheck(ctx))
 	_, _ = service1.getInstance(nil)
 	is.Nil(service1.healthcheck(ctx))
 
 	// healthcheck ok
-	service2 := newServiceTransient("foobar", func(i Injector) (*lazyTestHeathcheckerOK, error) {
-		return &lazyTestHeathcheckerOK{foobar: "foobar"}, nil
-	})
+	service2 := newServiceTransient(
+		"foobar", func(i Injector) (*lazyTestHeathcheckerOK, error) {
+			return &lazyTestHeathcheckerOK{foobar: "foobar"}, nil
+		},
+	)
 	is.Nil(service2.healthcheck(ctx))
 	_, _ = service2.getInstance(nil)
 	is.Nil(service2.healthcheck(ctx))
 
 	// healthcheck ko
-	service3 := newServiceTransient("foobar", func(i Injector) (*lazyTestHeathcheckerKO, error) {
-		return &lazyTestHeathcheckerKO{foobar: "foobar"}, nil
-	})
+	service3 := newServiceTransient(
+		"foobar", func(i Injector) (*lazyTestHeathcheckerKO, error) {
+			return &lazyTestHeathcheckerKO{foobar: "foobar"}, nil
+		},
+	)
 	is.Nil(service3.healthcheck(ctx))
 	_, _ = service3.getInstance(nil)
 	is.Nil(service3.healthcheck(ctx))
@@ -319,23 +345,29 @@ func TestServiceTransient_isShutdowner(t *testing.T) {
 	is := assert.New(t)
 
 	// no shutdown
-	service1 := newServiceTransient("foobar", func(i Injector) (lazyTest, error) {
-		return lazyTest{foobar: "foobar"}, nil
-	})
+	service1 := newServiceTransient(
+		"foobar", func(i Injector) (lazyTest, error) {
+			return lazyTest{foobar: "foobar"}, nil
+		},
+	)
 	is.False(service1.isShutdowner())
 
 	// shutdown ok
-	service2 := newServiceTransient("foobar", func(i Injector) (*lazyTestShutdownerOK, error) {
-		return &lazyTestShutdownerOK{foobar: "foobar"}, nil
-	})
+	service2 := newServiceTransient(
+		"foobar", func(i Injector) (*lazyTestShutdownerOK, error) {
+			return &lazyTestShutdownerOK{foobar: "foobar"}, nil
+		},
+	)
 	is.False(service2.isShutdowner())
 	_, _ = service2.getInstance(nil)
 	is.False(service2.isShutdowner())
 
 	// shutdown ko
-	service3 := newServiceTransient("foobar", func(i Injector) (*lazyTestShutdownerKO, error) {
-		return &lazyTestShutdownerKO{foobar: "foobar"}, nil
-	})
+	service3 := newServiceTransient(
+		"foobar", func(i Injector) (*lazyTestShutdownerKO, error) {
+			return &lazyTestShutdownerKO{foobar: "foobar"}, nil
+		},
+	)
 	is.False(service3.isShutdowner())
 	_, _ = service3.getInstance(nil)
 	is.False(service3.isShutdowner())
@@ -349,25 +381,31 @@ func TestServiceTransient_shutdown(t *testing.T) {
 	ctx := context.Background()
 
 	// no shutdown
-	service1 := newServiceTransient("foobar", func(i Injector) (lazyTest, error) {
-		return lazyTest{foobar: "foobar"}, nil
-	})
+	service1 := newServiceTransient(
+		"foobar", func(i Injector) (lazyTest, error) {
+			return lazyTest{foobar: "foobar"}, nil
+		},
+	)
 	is.Nil(service1.shutdown(ctx))
 	_, _ = service1.getInstance(nil)
 	is.Nil(service1.shutdown(ctx))
 
 	// shutdown ok
-	service2 := newServiceTransient("foobar", func(i Injector) (*lazyTestShutdownerOK, error) {
-		return &lazyTestShutdownerOK{foobar: "foobar"}, nil
-	})
+	service2 := newServiceTransient(
+		"foobar", func(i Injector) (*lazyTestShutdownerOK, error) {
+			return &lazyTestShutdownerOK{foobar: "foobar"}, nil
+		},
+	)
 	is.Nil(service2.shutdown(ctx))
 	_, _ = service2.getInstance(nil)
 	is.Nil(service2.shutdown(ctx))
 
 	// shutdown ko
-	service3 := newServiceTransient("foobar", func(i Injector) (*lazyTestShutdownerKO, error) {
-		return &lazyTestShutdownerKO{foobar: "foobar"}, nil
-	})
+	service3 := newServiceTransient(
+		"foobar", func(i Injector) (*lazyTestShutdownerKO, error) {
+			return &lazyTestShutdownerKO{foobar: "foobar"}, nil
+		},
+	)
 	is.Nil(service3.shutdown(ctx))
 	_, _ = service3.getInstance(nil)
 	is.Nil(service3.shutdown(ctx))
@@ -379,9 +417,11 @@ func TestServiceTransient_clone(t *testing.T) {
 	// @TODO
 
 	// initial
-	service1 := newServiceTransient("foobar", func(i Injector) (transientTest, error) {
-		return transientTest{foobar: "foobar"}, nil
-	})
+	service1 := newServiceTransient(
+		"foobar", func(i Injector) (transientTest, error) {
+			return transientTest{foobar: "foobar"}, nil
+		},
+	)
 	is.Equal("foobar", service1.getName())
 
 	// clone
@@ -399,9 +439,11 @@ func TestServiceTransient_source(t *testing.T) {
 	t.Parallel()
 	is := assert.New(t)
 
-	service1 := newServiceTransient("foobar", func(i Injector) (transientTest, error) {
-		return transientTest{foobar: "foobar"}, nil
-	})
+	service1 := newServiceTransient(
+		"foobar", func(i Injector) (transientTest, error) {
+			return transientTest{foobar: "foobar"}, nil
+		},
+	)
 	_, _ = service1.getInstance(nil)
 
 	a, b := service1.source()

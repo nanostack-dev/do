@@ -1,6 +1,9 @@
 
 # do - Dependency Injection
 
+## 🔧 Forked Library Notice
+This library is a fork of github.com/samber/do 🌟. All credit for the original implementation goes to the amazing contributors of that repository! 💻✨
+
 [![tag](https://img.shields.io/github/tag/samber/do.svg)](https://github.com/samber/do/releases)
 ![Go Version](https://img.shields.io/badge/Go-%3E%3D%201.18-%23007d9c)
 [![GoDoc](https://godoc.org/github.com/samber/do?status.svg)](https://pkg.go.dev/github.com/samber/do)
@@ -75,7 +78,7 @@ This library has no dependencies except the Go std lib.
 
 ## 🤠 Documentation
 
-- [GoDoc: https://godoc.org/github.com/samber/do/v2](https://godoc.org/github.com/samber/do/v2)
+- [GoDoc: https://godoc.org/github.com/nanostack-dev/do](https://godoc.org/github.com/nanostack-dev/do)
 - [Documentation](https://do.samber.dev/docs/getting-started)
 - [Examples](https://github.com/samber/do/tree/master/examples)
 - [Project templates](https://do.samber.dev/examples)

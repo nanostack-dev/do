@@ -6,7 +6,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/samber/do/v2/stacktrace"
+	"github.com/nanostack-dev/do/stacktrace"
 )
 
 var _ Service[int] = (*serviceAlias[int, int])(nil)
@@ -26,7 +26,9 @@ type serviceAlias[Initial any, Alias any] struct {
 	invokationFramesCounter uint32
 }
 
-func newServiceAlias[Initial any, Alias any](name string, scope Injector, targetName string) *serviceAlias[Initial, Alias] {
+func newServiceAlias[Initial any, Alias any](
+	name string, scope Injector, targetName string,
+) *serviceAlias[Initial, Alias] {
 	providerFrame, _ := stacktrace.NewFrameFromCaller()
 
 	return &serviceAlias[Initial, Alias]{
@@ -85,7 +87,9 @@ func (s *serviceAlias[Initial, Alias]) getInstance(i Injector) (Alias, error) {
 		return target, nil
 	default:
 		// should never happen, since invoke() checks the type
-		return empty[Alias](), serviceTypeMismatch(inferServiceName[Alias](), inferServiceName[Initial]())
+		return empty[Alias](), serviceTypeMismatch(
+			inferServiceName[Alias](), inferServiceName[Initial](),
+		)
 		// return empty[Alias](), fmt.Errorf("DI: could not cast `%s` as `%s`", s.targetName, s.name)
 	}
 }

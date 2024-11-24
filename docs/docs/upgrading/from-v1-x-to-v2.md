@@ -21,7 +21,7 @@ No breaking change will be done until v3.
 Update go.mod:
 
 ```sh
-go get -u github.com/samber/do/v2
+go get -u github.com/nanostack-dev/do
 ```
 
 Replace package import:

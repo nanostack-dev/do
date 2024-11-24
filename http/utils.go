@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"text/template"
 
-	"github.com/samber/do/v2"
+	"github.com/nanostack-dev/do"
 )
 
 func fromTemplate(tpl string, data any) (string, error) {

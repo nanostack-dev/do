@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/samber/do/v2"
+	"github.com/nanostack-dev/do"
 )
 
 /**
@@ -50,24 +50,28 @@ func startProgram() do.Injector {
 	do.ProvideNamedValue(injector, "wheel-4", &Wheel{})
 
 	// provide car
-	do.Provide(subScope, func(i do.Injector) (*Car, error) {
-		car := Car{
-			Engine: do.MustInvoke[*Engine](i),
-			Wheels: []*Wheel{
-				do.MustInvokeNamed[*Wheel](i, "wheel-1"),
-				do.MustInvokeNamed[*Wheel](i, "wheel-2"),
-				do.MustInvokeNamed[*Wheel](i, "wheel-3"),
-				do.MustInvokeNamed[*Wheel](i, "wheel-4"),
-			},
-		}
+	do.Provide(
+		subScope, func(i do.Injector) (*Car, error) {
+			car := Car{
+				Engine: do.MustInvoke[*Engine](i),
+				Wheels: []*Wheel{
+					do.MustInvokeNamed[*Wheel](i, "wheel-1"),
+					do.MustInvokeNamed[*Wheel](i, "wheel-2"),
+					do.MustInvokeNamed[*Wheel](i, "wheel-3"),
+					do.MustInvokeNamed[*Wheel](i, "wheel-4"),
+				},
+			}
 
-		return &car, nil
-	})
+			return &car, nil
+		},
+	)
 
 	// provide engine
-	do.Provide(injector, func(i do.Injector) (*Engine, error) {
-		return &Engine{}, nil
-	})
+	do.Provide(
+		injector, func(i do.Injector) (*Engine, error) {
+			return &Engine{}, nil
+		},
+	)
 
 	// start car
 	car := do.MustInvoke[*Car](subScope)

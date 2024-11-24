@@ -1,6 +1,6 @@
 package fixtures
 
-import "github.com/samber/do/v2"
+import "github.com/nanostack-dev/do"
 
 /**
  * driver

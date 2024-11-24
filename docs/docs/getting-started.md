@@ -17,7 +17,7 @@ This library has no dependencies except the Go std lib.
 Import package:
 
 ```sh
-go get -u github.com/samber/do/v2
+go get -u github.com/nanostack-dev/do
 ```
 
 ## Create a DI container
@@ -25,7 +25,7 @@ go get -u github.com/samber/do/v2
 The simplest way to start is to use the default options:
 
 ```go
-import "github.com/samber/do/v2"
+import "github.com/nanostack-dev/do"
 
 injector := do.New()
 ```

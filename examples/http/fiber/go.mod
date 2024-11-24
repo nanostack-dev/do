@@ -1,15 +1,15 @@
-module github.com/samber/do/v2/examples/http/fiber
+module github.com/nanostack-dev/do/examples/http/fiber
 
 go 1.18
 
-replace github.com/samber/do/v2 => ../../../
+replace github.com/nanostack-dev/do => ../../../
 
 replace github.com/samber/do/http/fiber/v2 => ../../../http/fiber
 
 require (
 	github.com/gofiber/fiber/v2 v2.51.0
-	github.com/samber/do/v2 v2.0.0-00010101000000-000000000000
 	github.com/samber/do/http/fiber/v2 v2.0.0-00010101000000-000000000000
+	github.com/nanostack-dev/do v2.0.0-00010101000000-000000000000
 )
 
 require (
@@ -20,7 +20,7 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
-	github.com/samber/go-type-to-string v1.1.0 // indirect
+	github.com/samber/go-type-to-string v1.6.1 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.50.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect

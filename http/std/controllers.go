@@ -4,43 +4,49 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/samber/do/v2"
-	dohttp "github.com/samber/do/v2/http"
+	"github.com/nanostack-dev/do"
+	dohttp "github.com/nanostack-dev/do/http"
 )
 
 func Use(basePath string, injector do.Injector) http.Handler {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		output, err := dohttp.IndexHTML(basePath)
-		response(w, []byte(output), err)
-	})
-
-	mux.HandleFunc("/scope", func(w http.ResponseWriter, r *http.Request) {
-		scopeID := r.URL.Query().Get("scope_id")
-		if scopeID == "" {
-			url := fmt.Sprintf("%s/scope?scope_id=%s", basePath, injector.ID())
-			http.Redirect(w, r, url, 302)
-			return
-		}
-
-		output, err := dohttp.ScopeTreeHTML(basePath, injector, scopeID)
-		response(w, []byte(output), err)
-	})
-
-	mux.HandleFunc("/service", func(w http.ResponseWriter, r *http.Request) {
-		scopeID := r.URL.Query().Get("scope_id")
-		serviceName := r.URL.Query().Get("service_name")
-
-		if scopeID == "" || serviceName == "" {
-			output, err := dohttp.ServiceListHTML(basePath, injector)
+	mux.HandleFunc(
+		"/", func(w http.ResponseWriter, r *http.Request) {
+			output, err := dohttp.IndexHTML(basePath)
 			response(w, []byte(output), err)
-			return
-		}
+		},
+	)
 
-		output, err := dohttp.ServiceHTML(basePath, injector, scopeID, serviceName)
-		response(w, []byte(output), err)
-	})
+	mux.HandleFunc(
+		"/scope", func(w http.ResponseWriter, r *http.Request) {
+			scopeID := r.URL.Query().Get("scope_id")
+			if scopeID == "" {
+				url := fmt.Sprintf("%s/scope?scope_id=%s", basePath, injector.ID())
+				http.Redirect(w, r, url, 302)
+				return
+			}
+
+			output, err := dohttp.ScopeTreeHTML(basePath, injector, scopeID)
+			response(w, []byte(output), err)
+		},
+	)
+
+	mux.HandleFunc(
+		"/service", func(w http.ResponseWriter, r *http.Request) {
+			scopeID := r.URL.Query().Get("scope_id")
+			serviceName := r.URL.Query().Get("service_name")
+
+			if scopeID == "" || serviceName == "" {
+				output, err := dohttp.ServiceListHTML(basePath, injector)
+				response(w, []byte(output), err)
+				return
+			}
+
+			output, err := dohttp.ServiceHTML(basePath, injector, scopeID, serviceName)
+			response(w, []byte(output), err)
+		},
+	)
 
 	return http.StripPrefix(basePath, mux)
 }

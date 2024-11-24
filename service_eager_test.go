@@ -78,7 +78,7 @@ func TestServiceEager_getTypeName(t *testing.T) {
 	is.Equal("int", service1.getTypeName())
 
 	service2 := newServiceEager("foobar2", test)
-	is.Equal("github.com/samber/do/v2.eagerTest", service2.getTypeName())
+	is.Equal("github.com/nanostack-dev/do.eagerTest", service2.getTypeName())
 }
 
 func TestServiceEager_getServiceType(t *testing.T) {
